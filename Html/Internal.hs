@@ -5,7 +5,6 @@ el tag content =
   "<" <> tag <> ">" <> content <> "</" <> tag <> ">"
  
 data Structure = Structure String
-    deriving Show
 data Html = Html String
     deriving Show
 
@@ -25,7 +24,7 @@ render (Html str) = str
 
 getStructureString (Structure str ) = str
 
-html_ title content =  Html (f . head_ $ f (append_ (title_ (escape title )) (body_ (escape content))))
+html_ title content =  Html (f . head_ $ f (append_ (title_ title ) (body_ content)))
   where f = getStructureString
 
 escape :: String -> String
