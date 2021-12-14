@@ -8,6 +8,9 @@ data Structure = Structure String
 data Html = Html String
     deriving Show
 
+instance Semigroup Structure where
+  (<>) = append_
+
 dummy = Structure ""
 
 body_ = Structure . el "body" . escape

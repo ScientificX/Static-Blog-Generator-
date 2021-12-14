@@ -3,7 +3,6 @@ module Html
     , title_
     , p1_
     , h1_
-    , append_
     , render
     , html_
 
