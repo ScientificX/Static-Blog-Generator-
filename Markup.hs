@@ -24,18 +24,21 @@ head_par = [ Header 1 "Welcome"
            ]
 
 parse :: String -> Document
-parse = parseLines [] . lines
+parse = parseLines Nothing . lines
 
-parseLines :: [String] -> [String] -> Document
-parseLines currParsed txts = 
-  let paragraph = Paragraph ( unlines $ reverse currParsed )
-    in
+parseLines :: Maybe Structure -> [String] -> Document
+parseLines ctx txts = 
       case txts of
-        [] -> [paragraph]
+        [] -> maybeToList ctx
         currLine:rest -> 
           if trim currLine == ""
             then 
-              paragraph:parseLines [] rest
+              maybe id (:) ctx $ parseLines Nothing rest
           else
-            parseLines (currLine:currParsed) rest
+            case ctx of
+              Just (Paragraph x) -> parseLines (Just (Paragraph (x <> currLine))) rest
+              _                  -> maybe id (:) ctx $ parseLines (Just (Paragraph currLine)) rest
+
 trim = unwords . words
+maybeToList Nothing = []
+maybeToList (Just x) = [x]
