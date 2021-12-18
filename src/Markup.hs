@@ -44,6 +44,24 @@ parseLines ctx txts =
             _ ->
               maybe id (:) ctx $ parseLines (Just (Paragraph item) ) rest
 
+        -- OrderedLists
+        ('#':' ':line):rest -> 
+          case ctx of
+            (Just (OrderedList list)) -> 
+              parseLines (Just (OrderedList (list <> [trim line]))) rest
+            _ -> 
+              maybe id (:) ctx $ parseLines Nothing rest
+        
+        -- CodeBlock
+        ('>':' ':line):rest ->
+          case ctx of
+            (Just (Codeblock lines)) ->
+              parseLines (Just (Codeblock (lines <> [trim line]))) rest
+            _ ->
+              maybe id (:) ctx $ parseLines Nothing rest
+
+
+
         -- Paragraphs           
 
         (line:rest) ->
@@ -58,6 +76,7 @@ parseLines ctx txts =
                     parseLines (Just (Paragraph (content <> (trim line)))) rest
                   _ ->
                     maybe id (:) ctx $ (parseLines (Just (Paragraph line)) rest) 
+
 
 trim = unwords . words
 maybeToList Nothing = []
