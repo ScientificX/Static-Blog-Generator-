@@ -1,7 +1,13 @@
+image:
+  file: .gitpod.Dockerfile
 tasks:
   - init: |
-      echo 'TODO: build project'
+      cabal update
+      stack build
+
     command: |
-      echo 'TODO: start app'
-    command:
-      sudo apt install ghc -y
+      stack test
+
+vscode:
+  extensions:
+    - haskell.haskell

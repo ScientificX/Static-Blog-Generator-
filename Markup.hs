@@ -18,7 +18,6 @@ data Structure
 
 hello_world = Paragraph "Hello, World !"
 
-head_par :: Document
 head_par = [ Header 1 "Welcome"
            , Paragraph "we begin"
            ]
@@ -30,14 +29,35 @@ parseLines :: Maybe Structure -> [String] -> Document
 parseLines ctx txts = 
       case txts of
         [] -> maybeToList ctx
-        currLine:rest -> 
-          if trim currLine == ""
-            then 
-              maybe id (:) ctx $ parseLines Nothing rest
-          else
-            case ctx of
-              Just (Paragraph x) -> parseLines (Just (Paragraph (x <> currLine))) rest
-              _                  -> maybe id (:) ctx $ parseLines (Just (Paragraph currLine)) rest
+
+        -- Header case
+
+        ('*':' ':line):rest -> 
+          maybe id (:) ctx $ ((Header 1 (trim line)):(parseLines Nothing rest))
+
+        -- Unordered Lists
+
+        ('-':' ':item):rest -> 
+          case ctx of 
+            (Just(UnorderedList list)) -> 
+              parseLines (Just (UnorderedList (list <> [trim item])) ) rest
+            _ ->
+              maybe id (:) ctx $ parseLines (Just (Paragraph item) ) rest
+
+        -- Paragraphs           
+
+        (line:rest) ->
+          let trimLine = (trim line)
+            in
+              if line == ""
+                then
+                  maybe id (:) ctx $ (parseLines Nothing rest)
+              else
+                case ctx of
+                  (Just (Paragraph content)) -> 
+                    parseLines (Just (Paragraph (content <> (trim line)))) rest
+                  _ ->
+                    maybe id (:) ctx $ (parseLines (Just (Paragraph line)) rest) 
 
 trim = unwords . words
 maybeToList Nothing = []
