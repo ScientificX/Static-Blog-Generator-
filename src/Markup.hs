@@ -42,27 +42,29 @@ parseLines ctx txts =
             (Just(UnorderedList list)) -> 
               parseLines (Just (UnorderedList (list <> [trim item])) ) rest
             _ ->
-              maybe id (:) ctx $ parseLines (Just (Paragraph item) ) rest
+              maybe id (:) ctx $ parseLines (Just (UnorderedList [item]) ) rest
 
         -- OrderedLists
-        ('#':' ':line):rest -> 
+        str@('#':' ':item):rest -> 
           case ctx of
             (Just (OrderedList list)) -> 
-              parseLines (Just (OrderedList (list <> [trim line]))) rest
+              parseLines (Just (OrderedList (list <> [trim item]))) rest
             _ -> 
-              maybe id (:) ctx $ parseLines Nothing rest
+              maybe id (:) ctx $ parseLines (Just (OrderedList [item])) rest
         
         -- CodeBlock
-        ('>':' ':line):rest ->
+        str@('>':' ':line):rest ->
           case ctx of
             (Just (Codeblock lines)) ->
               parseLines (Just (Codeblock (lines <> [trim line]))) rest
             _ ->
-              maybe id (:) ctx $ parseLines Nothing rest
+              maybe id (:) ctx $ parseLines (Just (Codeblock [line])) rest
 
 
 
         -- Paragraphs           
+
+  -- Paragraphs           
 
         (line:rest) ->
           let trimLine = (trim line)
@@ -77,7 +79,7 @@ parseLines ctx txts =
                   _ ->
                     maybe id (:) ctx $ (parseLines (Just (Paragraph line)) rest) 
 
-
+ 
 trim = unwords . words
 maybeToList Nothing = []
 maybeToList (Just x) = [x]

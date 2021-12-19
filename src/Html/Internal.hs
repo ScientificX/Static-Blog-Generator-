@@ -19,10 +19,22 @@ title_ = Structure . el "title" . escape
 p1_ = Structure . el "p1" . escape
 h1_ = Structure . el "h1" . escape
 li_ = Structure . el "li" . escape
+code_ = Structure . el "code" . escape
 
-ul_ lx = foldr append_ (Structure "")  (map li_ $ map getStructureString lx)
+
+ul_ lx = (Structure . el "ul" . escape) $ getStructureString $ f lx
+  where
+    f lx = foldr append_ (Structure "")  (map li_ $ map getStructureString lx)
+
+
+
+ol_ lx = (Structure . el "ol" . escape) $ getStructureString $ f lx
+  where
+    f lx = foldr append_ (Structure "")  (map li_ $ map getStructureString lx)
+
 
 append_ (Structure a) (Structure b) = Structure (a <> b)
+
 render (Html str) = str
 
 getStructureString (Structure str ) = str
